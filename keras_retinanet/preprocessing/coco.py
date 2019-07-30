@@ -141,7 +141,12 @@ class CocoGenerator(Generator):
             # some annotations have basically no width / height, skip them
             if a['bbox'][2] < 1 or a['bbox'][3] < 1:
                 continue
-
+            
+            #skip labels except person
+            if not a['category_id'] == 1:
+                continue
+            
+            
             annotations['labels'] = np.concatenate([annotations['labels'], [self.coco_label_to_label(a['category_id'])]], axis=0)
             annotations['bboxes'] = np.concatenate([annotations['bboxes'], [[
                 a['bbox'][0],

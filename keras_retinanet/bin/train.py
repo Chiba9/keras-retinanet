@@ -47,6 +47,7 @@ from ..utils.config import read_config_file, parse_anchor_parameters
 from ..utils.keras_version import check_keras_version
 from ..utils.model import freeze as freeze_model
 from ..utils.transform import random_transform_generator
+from ..utils.visualization import draw_box, draw_caption
 
 
 def makedirs(path):
@@ -64,9 +65,9 @@ def get_session():
     """ Construct a modified tf session.
     """
     config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
+    #config.gpu_options.allow_growth = False
+    config.gpu_options.per_process_gpu_memory_fraction = 0.5
     return tf.Session(config=config)
-
 
 def model_with_weights(model, weights, skip_mismatch):
     """ Load weights for model.
@@ -150,7 +151,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
     callbacks = []
 
     tensorboard_callback = None
-
+    '''
     if args.tensorboard_dir:
         tensorboard_callback = keras.callbacks.TensorBoard(
             log_dir                = args.tensorboard_dir,
@@ -164,7 +165,7 @@ def create_callbacks(model, training_model, prediction_model, validation_generat
             embeddings_metadata    = None
         )
         callbacks.append(tensorboard_callback)
-
+    '''
     if args.evaluation and validation_generator:
         if args.dataset_type == 'coco':
             from ..callbacks.coco import CocoEval
@@ -424,8 +425,8 @@ def parse_args(args):
 
     return check_args(parser.parse_args(args))
 
-
 def main(args=None):
+    
     # parse arguments
     if args is None:
         args = sys.argv[1:]
@@ -511,4 +512,4 @@ def main(args=None):
 
 
 if __name__ == '__main__':
-    main()
+    model = main()
