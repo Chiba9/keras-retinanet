@@ -10,6 +10,7 @@ class Backbone(object):
         from .. import layers
         from .. import losses
         from .. import initializers
+
         self.custom_objects = {
             'UpsampleLike'     : layers.UpsampleLike,
             'PriorProbability' : initializers.PriorProbability,
@@ -57,6 +58,8 @@ def backbone(backbone_name):
         from .vgg import VGGBackbone as b
     elif 'densenet' in backbone_name:
         from .densenet import DenseNetBackbone as b
+    elif 'efficientnet' in backbone_name:
+        from .efficientnet import EfficientNetBackbone as b
     else:
         raise NotImplementedError('Backbone class for  \'{}\' not implemented.'.format(backbone))
 

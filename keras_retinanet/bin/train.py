@@ -47,7 +47,6 @@ from ..utils.config import read_config_file, parse_anchor_parameters
 from ..utils.keras_version import check_keras_version
 from ..utils.model import freeze as freeze_model
 from ..utils.transform import random_transform_generator
-from ..utils.visualization import draw_box, draw_caption
 
 
 def makedirs(path):
@@ -257,6 +256,23 @@ def create_generators(args, preprocess_image):
             shuffle_groups=False,
             **common_args
         )
+    elif args.dataset_type == 'mydata':
+        # import here to prevent unnecessary dependency on cocoapi
+        from ..preprocessing.coco import CocoGenerator
+
+        train_generator = CocoGenerator(
+            args.coco_path,
+            '5773',
+            transform_generator=transform_generator,
+            **common_args
+        )
+
+        validation_generator = CocoGenerator(
+            args.coco_path,
+            '665',
+            shuffle_groups=False,
+            **common_args
+        )
     elif args.dataset_type == 'pascal':
         train_generator = PascalVocGenerator(
             args.pascal_path,
@@ -370,6 +386,9 @@ def parse_args(args):
 
     coco_parser = subparsers.add_parser('coco')
     coco_parser.add_argument('coco_path', help='Path to dataset directory (ie. /tmp/COCO).')
+    
+    coco_parser = subparsers.add_parser('mydata')
+    coco_parser.add_argument('coco_path', help='Path to dataset directory (ie. /tmp/COCO).')
 
     pascal_parser = subparsers.add_parser('pascal')
     pascal_parser.add_argument('pascal_path', help='Path to dataset directory (ie. /tmp/VOCdevkit).')
@@ -480,7 +499,7 @@ def main(args=None):
     print(model.summary())
 
     # this lets the generator compute backbone layer shapes using the actual backbone model
-    if 'vgg' in args.backbone or 'densenet' in args.backbone:
+    if 'vgg' in args.backbone or 'densenet' in args.backbone or 'efficientnet' in args.backbone:
         train_generator.compute_shapes = make_shapes_callback(model)
         if validation_generator:
             validation_generator.compute_shapes = train_generator.compute_shapes

@@ -59,6 +59,18 @@ def create_generator(args):
             config=args.config,
             shuffle_groups=False,
         )
+    elif args.dataset_type == 'mydata':
+        # import here to prevent unnecessary dependency on cocoapi
+        from ..preprocessing.coco import CocoGenerator
+
+        validation_generator = CocoGenerator(
+            args.coco_path,
+            '5773',
+            image_min_side=args.image_min_side,
+            image_max_side=args.image_max_side,
+            config=args.config,
+            shuffle_groups=False,
+        )
     elif args.dataset_type == 'pascal':
         validation_generator = PascalVocGenerator(
             args.pascal_path,
@@ -92,6 +104,9 @@ def parse_args(args):
 
     coco_parser = subparsers.add_parser('coco')
     coco_parser.add_argument('coco_path', help='Path to dataset directory (ie. /tmp/COCO).')
+
+    mydata_parser = subparsers.add_parser('mydata')
+    mydata_parser.add_argument('coco_path', help='Path to dataset directory (ie. /tmp/COCO).')
 
     pascal_parser = subparsers.add_parser('pascal')
     pascal_parser.add_argument('pascal_path', help='Path to dataset directory (ie. /tmp/VOCdevkit).')
